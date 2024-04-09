@@ -9,7 +9,9 @@
 #include "controller_brescianini.h"
 #include "controller_lee.h"
 
+#ifndef CONFIG_PLATFORM_SITL
 #include "autoconf.h"
+#endif
 
 #define DEFAULT_CONTROLLER ControllerTypePID
 static ControllerType currentController = ControllerTypeAutoSelect;

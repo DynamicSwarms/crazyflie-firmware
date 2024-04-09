@@ -60,7 +60,7 @@ void paramInit(void)
   }
 
   paramLogicInit();
-  paramLogicStorageInit();
+  //paramLogicStorageInit();
 
   //Start the param task
   STATIC_MEM_TASK_CREATE(paramTask, paramTask, PARAM_TASK_NAME, NULL, PARAM_TASK_PRI);
@@ -97,6 +97,7 @@ void paramTask(void * prm)
         case MISC_GET_EXTENDED_TYPE_V2:
           paramGetExtendedTypeV2(&p);
           break;
+        #ifndef CONFIG_PLATFORM_SITL
         case MISC_PERSISTENT_STORE:
           paramPersistentStore(&p);
           break;
@@ -106,6 +107,7 @@ void paramTask(void * prm)
         case MISC_PERSISTENT_CLEAR:
           paramPersistentClear(&p);
           break;
+        #endif
         case MISC_GET_DEFAULT_VALUE:
           paramGetDefaultValue(&p);
           break;

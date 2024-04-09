@@ -76,4 +76,11 @@ uint32_t powerDistributionGetIdleThrust();
  */
 float powerDistributionGetMaxThrust();
 
+#ifdef CONFIG_PLATFORM_SITL
+#define NBR_OF_MOTORS 4
+void motorsSetRatio(const motors_thrust_pwm_t* motorPwm);
+
+uint16_t getMotorRatio(int id);
+#endif
+
 #endif //__POWER_DISTRIBUTION_H__

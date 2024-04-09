@@ -241,6 +241,7 @@ static void kalmanTask(void* parameters) {
   #endif
 
     // Run the system dynamics to predict the state forward.
+    // if (accSubSampler.count > 0 && gyroSubSampler.count > 0) {
     if (nowMs >= nextPredictionMs) {
       axis3fSubSamplerFinalize(&accSubSampler);
       axis3fSubSamplerFinalize(&gyroSubSampler);
@@ -251,7 +252,7 @@ static void kalmanTask(void* parameters) {
       STATS_CNT_RATE_EVENT(&predictionCounter);
 
       if (!rateSupervisorValidate(&rateSupervisorContext, nowMs)) {
-        DEBUG_PRINT("WARNING: Kalman prediction rate off (%lu)\n", rateSupervisorLatestCount(&rateSupervisorContext));
+        DEBUG_PRINT("WARNING: Kalman prediction rate off (%lu)\n", (unsigned long)rateSupervisorLatestCount(&rateSupervisorContext));
       }
     }
 

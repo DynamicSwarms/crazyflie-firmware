@@ -35,7 +35,9 @@
 #include "config.h"
 #include "crtp.h"
 #include "platformservice.h"
+#ifndef CONFIG_PLATFORM_SITL
 #include "syslink.h"
+#endif
 #include "version.h"
 #include "platform.h"
 #include "app_channel.h"
@@ -118,6 +120,9 @@ static void platformSrvTask(void* prm)
 
 static void platformCommandProcess(CRTPPacket *p)
 {
+  #ifdef CONFIG_PLATFORM_SITL
+    return;
+  #else
   uint8_t command = p->data[0];
   uint8_t *data = &p->data[1];
 
@@ -161,6 +166,7 @@ static void platformCommandProcess(CRTPPacket *p)
     default:
       break;
   }
+  #endif
 }
 
 int platformserviceSendAppchannelPacket(CRTPPacket *p)
@@ -190,6 +196,7 @@ static void versionCommandProcess(CRTPPacket *p)
       p->size = (strlen(V_STAG)>CRTP_MAX_DATA_SIZE-1)?CRTP_MAX_DATA_SIZE:strlen(V_STAG)+1;
       crtpSendPacketBlock(p);
       break;
+    #ifndef CONFIG_PLATFORM_SITL
     case getDeviceTypeName:
       {
       const char* name = platformConfigGetDeviceTypeName();
@@ -198,6 +205,7 @@ static void versionCommandProcess(CRTPPacket *p)
       crtpSendPacketBlock(p);
       }
       break;
+    #endif
     default:
       break;
   }
