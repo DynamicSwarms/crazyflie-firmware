@@ -5,11 +5,19 @@ menu "Build and debug options"
 config CROSS_COMPILE
     string "Cross-compiler tool prefix"
     default "arm-none-eabi-"
+    depends on !SITL
     help
         Same as running 'make CROSS_COMPILE=prefix-' but stored for
         default make runs in this application build directory.  You don't
         need to set this unless you want the configured application build
         directory to select the cross-compiler automatically.
+
+config SITL
+    bool "Enable software-in-the-loop build"
+    default n
+    help
+        Enable the firmware to be built for software-in-the-loop and paired with
+        the Gazebo simulator.
 
 config DEBUG
     bool "Enable debug build"
@@ -144,12 +152,6 @@ config SENSORS_BOSCH
     bool "Include Bosch sensors"
     default n
 
-config SENSORS_SITL
-bool "Support for SITL sensors"
-default n
-help
-    Include support for SITL sensors
-
 config SENSORS_IGNORE_BAROMETER_FAIL
     bool "Ignore failure from barometer"
     depends on SENSORS_BMI088_BMP3XX
@@ -168,6 +170,13 @@ config SENSORS_BMI088_I2C
     default n
     help
         Include support using I2C with the Bosch bmi088 inertial sensor
+
+config SENSORS_SITL
+    bool "Support for SITL sensors"
+    depends on PLATFORM_SITL
+    default n
+    help
+        Include support for SITL sensors
 
 endmenu
 

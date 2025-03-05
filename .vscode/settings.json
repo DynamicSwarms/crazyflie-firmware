@@ -5,6 +5,47 @@
         "**/bower_components": true
     },
     "files.associations": {
-        "bootloader.h": "c"
-    }
+        "bootloader.h": "c",
+        "functional": "cpp"
+    },
+    "python.autoComplete.extraPaths": [
+        "/home/llanesc/Llanes_RAL2024/ros2_ws/install/multiagent_pursuit_evasion_interfaces/local/lib/python3.10/dist-packages",
+        "/home/llanesc/Llanes_RAL2024/ros2_ws/build/multiagent_pursuit_evasion",
+        "/home/llanesc/Llanes_RAL2024/ros2_ws/install/multiagent_pursuit_evasion/lib/python3.10/site-packages",
+        "/home/llanesc/Llanes_RAL2024/ros2_ws/install/motion_capture_tracking_interfaces/local/lib/python3.10/dist-packages",
+        "/home/llanesc/Llanes_RAL2024/ros2_ws/install/crazyflie_sim/local/lib/python3.10/dist-packages",
+        "/home/llanesc/Llanes_RAL2024/ros2_ws/install/crazyflie_examples/local/lib/python3.10/dist-packages",
+        "/home/llanesc/Llanes_RAL2024/ros2_ws/build/crazyflie_py",
+        "/home/llanesc/Llanes_RAL2024/ros2_ws/install/crazyflie_py/lib/python3.10/site-packages",
+        "/home/llanesc/Llanes_RAL2024/ros2_ws/install/crazyflie_interfaces/local/lib/python3.10/dist-packages",
+        "/home/llanesc/Llanes_ICRA2024/crazyflie-mpc-example/ros2_ws/install/crazyflie_sim/local/lib/python3.10/dist-packages",
+        "/home/llanesc/Llanes_ICRA2024/crazyflie-mpc-example/ros2_ws/build/crazyflie_mpc",
+        "/home/llanesc/Llanes_ICRA2024/crazyflie-mpc-example/ros2_ws/install/crazyflie_mpc/lib/python3.10/site-packages",
+        "/home/llanesc/Llanes_ICRA2024/crazyflie-mpc-example/ros2_ws/install/crazyflie_examples/local/lib/python3.10/dist-packages",
+        "/home/llanesc/Llanes_ICRA2024/crazyflie-mpc-example/ros2_ws/build/crazyflie_py",
+        "/home/llanesc/Llanes_ICRA2024/crazyflie-mpc-example/ros2_ws/install/crazyflie_py/lib/python3.10/site-packages",
+        "/home/llanesc/Llanes_ICRA2024/crazyflie-mpc-example/ros2_ws/install/crazyflie_interfaces/local/lib/python3.10/dist-packages",
+        "/opt/ros/humble/lib/python3.10/site-packages",
+        "/opt/ros/humble/local/lib/python3.10/dist-packages"
+    ],
+    "python.analysis.extraPaths": [
+        "/home/llanesc/Llanes_RAL2024/ros2_ws/install/multiagent_pursuit_evasion_interfaces/local/lib/python3.10/dist-packages",
+        "/home/llanesc/Llanes_RAL2024/ros2_ws/build/multiagent_pursuit_evasion",
+        "/home/llanesc/Llanes_RAL2024/ros2_ws/install/multiagent_pursuit_evasion/lib/python3.10/site-packages",
+        "/home/llanesc/Llanes_RAL2024/ros2_ws/install/motion_capture_tracking_interfaces/local/lib/python3.10/dist-packages",
+        "/home/llanesc/Llanes_RAL2024/ros2_ws/install/crazyflie_sim/local/lib/python3.10/dist-packages",
+        "/home/llanesc/Llanes_RAL2024/ros2_ws/install/crazyflie_examples/local/lib/python3.10/dist-packages",
+        "/home/llanesc/Llanes_RAL2024/ros2_ws/build/crazyflie_py",
+        "/home/llanesc/Llanes_RAL2024/ros2_ws/install/crazyflie_py/lib/python3.10/site-packages",
+        "/home/llanesc/Llanes_RAL2024/ros2_ws/install/crazyflie_interfaces/local/lib/python3.10/dist-packages",
+        "/home/llanesc/Llanes_ICRA2024/crazyflie-mpc-example/ros2_ws/install/crazyflie_sim/local/lib/python3.10/dist-packages",
+        "/home/llanesc/Llanes_ICRA2024/crazyflie-mpc-example/ros2_ws/build/crazyflie_mpc",
+        "/home/llanesc/Llanes_ICRA2024/crazyflie-mpc-example/ros2_ws/install/crazyflie_mpc/lib/python3.10/site-packages",
+        "/home/llanesc/Llanes_ICRA2024/crazyflie-mpc-example/ros2_ws/install/crazyflie_examples/local/lib/python3.10/dist-packages",
+        "/home/llanesc/Llanes_ICRA2024/crazyflie-mpc-example/ros2_ws/build/crazyflie_py",
+        "/home/llanesc/Llanes_ICRA2024/crazyflie-mpc-example/ros2_ws/install/crazyflie_py/lib/python3.10/site-packages",
+        "/home/llanesc/Llanes_ICRA2024/crazyflie-mpc-example/ros2_ws/install/crazyflie_interfaces/local/lib/python3.10/dist-packages",
+        "/opt/ros/humble/lib/python3.10/site-packages",
+        "/opt/ros/humble/local/lib/python3.10/dist-packages"
+    ]
 }

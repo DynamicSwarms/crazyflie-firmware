@@ -1,29 +1,44 @@
-obj-y += cfassert.o
-obj-y += clockCorrectionEngine.o
+ifndef CONFIG_SITL
 obj-y += configblockeeprom.o
-obj-y += cpuid.o
+else CONFIG_SITL
+obj-y += configblocksitl.o
+endif
+
+obj-y += eprintf.o
 obj-y += crc32.o
 obj-y += debug.o
-obj-y += eprintf.o
+obj-y += cfassert.o
+ifndef CONFIG_SITL
+obj-y += clockCorrectionEngine.o
+obj-y += cpuid.o
 obj-y += buf2buf.o
+endif
 
-obj-y += filter.o
+ifndef CONFIG_SITL
 obj-y += FreeRTOS-openocd.o
+endif
+obj-y += filter.o
 
+ifndef CONFIG_SITL
+obj-y += sleepus.o
+endif
 obj-y += num.o
 obj-y += rateSupervisor.o
-obj-y += sleepus.o
 obj-y += statsCnt.o
 
 ### Sub directories
+ifndef CONFIG_SITL
 obj-y += kve/
-obj-y += lighthouse/
 obj-y += tdoa/
+obj-y += lighthouse/
+endif
 
 
 ### Implementations for abort(), malloc() and free(), needed to interact with apps written in C++
+ifndef CONFIG_SITL
 obj-y += abort.o
 obj-y += malloc.o
+endif
 obj-y += pid.o
 
 ### Rules for handling generated version.c
