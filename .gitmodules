@@ -16,4 +16,4 @@
 [submodule "tools/crazyflie-simulation"]
 	path = tools/crazyflie-simulation
 	url = https://github.com/llanesc/crazyflie-simulation.git
-	branch = sitl-release
+	branch = crazysim
