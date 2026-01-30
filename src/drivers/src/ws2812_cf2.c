@@ -35,9 +35,7 @@
 #include "FreeRTOS.h"
 #include "semphr.h"
 
-#ifndef CONFIG_PLATFORM_SITL
 #include "autoconf.h"
-#endif
 
 //#define TIM1_CCR1_Address 0x40012C34	// physical memory address of Timer 3 CCR1 register
 

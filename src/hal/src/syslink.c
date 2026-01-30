@@ -36,9 +36,7 @@
 #include "timers.h"
 
 #include "config.h"
-#ifndef CONFIG_PLATFORM_SITL
 #include "autoconf.h"
-#endif
 #include "debug.h"
 #include "syslink.h"
 #include "radiolink.h"

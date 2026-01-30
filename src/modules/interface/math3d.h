@@ -644,6 +644,28 @@ static inline struct quat rpy2quat(struct vec rpy) {
 
 	return mkquat(qx, qy, qz, qw);
 }
+// construct rotation matrix from (roll, pitch, yaw) Euler angles using Tait-Bryan convention
+// (yaw, then pitch about new pitch axis, then roll about new roll axis)
+static inline struct mat33 rpy2rotmat(struct vec rpy) {
+	float r = rpy.x;  // roll
+	float p = rpy.y;  // pitch
+	float y = rpy.z;  // yaw
+	float cr = cosf(r); float sr = sinf(r);
+	float cp = cosf(p); float sp = sinf(p);
+	float cy = cosf(y); float sy = sinf(y);
+
+	struct mat33 m;
+	m.m[0][0] = cy * cp;
+	m.m[0][1] = cy * sp * sr - sy * cr;
+	m.m[0][2] = cy * sp * cr + sy * sr;
+	m.m[1][0] = sy * cp;
+	m.m[1][1] = sy * sp * sr + cy * cr;
+	m.m[1][2] = sy * sp * cr - cy * sr;
+	m.m[2][0] = -sp;
+	m.m[2][1] = cp * sr;
+	m.m[2][2] = cp * cr;
+	return m;
+}
 // APPROXIMATE construction of a quaternion from small (roll, pitch, yaw) Euler angles
 // without computing any trig functions. only produces useful result for small angles.
 // Example application is integrating a gyroscope when the angular velocity

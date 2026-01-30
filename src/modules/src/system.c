@@ -359,7 +359,8 @@ void systemTask(void *arg)
   #ifndef CONFIG_PLATFORM_SITL
   DEBUG_PRINT("Free heap: %d bytes\n", xPortGetFreeHeapSize());
   #endif
-  workerLoop();
+  // Note: workerLoop() was removed in favor of task-based worker (see workerInit)
+  // workerLoop();
 
   //Should never reach this point!
   while(1)

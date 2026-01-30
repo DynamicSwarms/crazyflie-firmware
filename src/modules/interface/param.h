@@ -41,7 +41,7 @@ struct param_s {
   void * (*getter)(void);
   /*TODO: Need a better solution for this */
   #if defined(ARCH_32) && defined(CONFIG_PLATFORM_SITL)
-    uint8_t useless[3];
+    uint8_t useless[12];
   #elif defined(ARCH_64) && defined(CONFIG_PLATFORM_SITL)
     uint8_t useless[24];
   #endif

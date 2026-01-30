@@ -27,9 +27,9 @@
 #ifndef PM_H_
 #define PM_H_
 
-#ifndef CONFIG_PLATFORM_SITL
+// #ifndef CONFIG_PLATFORM_SITL
 #include "autoconf.h"
-#endif
+// #endif
 #include "adc.h"
 #include "syslink.h"
 #include "deck.h"

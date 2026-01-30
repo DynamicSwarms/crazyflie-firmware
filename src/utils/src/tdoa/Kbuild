@@ -1,3 +1,5 @@
+ifneq ($(CONFIG_PLATFORM_SITL),y)
 obj-$(CONFIG_DECK_LOCO) += tdoaEngine.o
 obj-$(CONFIG_DECK_LOCO) += tdoaStats.o
 obj-$(CONFIG_DECK_LOCO) += tdoaStorage.o
+endif

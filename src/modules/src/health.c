@@ -44,9 +44,7 @@
 #include "motors.h"
 #include "sensors.h"
 #include "pm.h"
-#ifndef CONFIG_PLATFORM_SITL
 #include "autoconf.h"
-#endif
 
 #include "static_mem.h"
 

@@ -113,4 +113,9 @@ bool platformConfigPhysicalLayoutAntennasAreClose() {
 const MotorPerifDef** platformConfigGetMotorMapping() {
   return active_config->motorMap;
 }
+#else
+// SITL doesn't need motor mapping - motors_sitl.c ignores it
+const MotorPerifDef** platformConfigGetMotorMapping() {
+  return NULL;
+}
 #endif

@@ -1,3 +1,5 @@
+# Detect Makefile directory to support being called from outside
+MAKEFILE_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 
 OPENOCD           ?= openocd
 OPENOCD_INTERFACE ?= interface/stlink-v2.cfg
@@ -112,6 +114,39 @@ ifeq ($(CONFIG_PLATFORM_FLAPPER),y)
 PLATFORM = flapper
 endif
 
+ifeq ($(CONFIG_PLATFORM_SITL),y)
+PLATFORM = sitl
+# Override ARM-specific settings for SITL (64-bit POSIX build)
+ARCH = posix
+SRCARCH = posix
+ARCH_CFLAGS = -O3 -pthread -DCONFIG_PLATFORM_SITL -DARCH_64
+ARCH_CFLAGS += -DSTM32F40_41xxx -DSTM32F4XX -DHSE_VALUE=8000000 -DUSE_STDPERIPH_DRIVER
+ARCH_CFLAGS += -Wno-unused-variable -std=gnu11 -Wall -Wmissing-braces
+ARCH_CFLAGS += -fno-strict-aliasing -ffunction-sections -fdata-sections
+ARCH_CFLAGS += -Wdouble-promotion -Wno-deprecated-declarations
+ARCH_CFLAGS += -Wno-implicit-function-declaration -Wno-error=implicit-function-declaration
+ARCH_CFLAGS += -Wno-maybe-uninitialized -Wno-error=maybe-uninitialized
+ARCH_CFLAGS += -Wno-unused-function -Wno-error=unused-function
+ARCH_CFLAGS += -Wno-format -Wno-error=format
+ARCH_CFLAGS += -Wno-incompatible-pointer-types -Wno-error=incompatible-pointer-types
+ARCH_CFLAGS += -Wno-int-to-pointer-cast -Wno-pointer-to-int-cast
+ARCH_CFLAGS += -Wno-overflow -Wno-array-bounds
+# Clear ARM-specific flags and use native compiler
+CROSS_COMPILE =
+LDFLAGS = -pthread
+FREERTOS = $(srctree)/vendor/FreeRTOS
+PORT = $(FREERTOS)/portable/ThirdParty/GCC/Posix
+LINKER_DIR = $(srctree)/sitl_make
+image_LDFLAGS = -Wl,-Map=$(PROG).map,--cref,--gc-sections
+image_LDFLAGS += -T $(LINKER_DIR)/log_param_linker.ld
+# Override memory sizes (not applicable for SITL)
+MEM_SIZE_FLASH_K = 0
+MEM_SIZE_RAM_K = 0
+MEM_SIZE_CCM_K = 0
+# Update includes for FreeRTOS POSIX port
+INCLUDES += -I$(FREERTOS)/portable/ThirdParty/GCC/Posix
+INCLUDES += -I$(FREERTOS)/portable/ThirdParty/GCC/Posix/utils
+endif
 
 PLATFORM  ?= cf2
 PROG ?= $(PLATFORM)
@@ -124,12 +159,20 @@ endif
 
 _all:
 
+ifeq ($(CONFIG_PLATFORM_SITL),y)
+all: $(PROG).elf
+	@echo "Build for the $(PLATFORM) platform!"
+	@$(PYTHON) $(srctree)/tools/make/versionTemplate.py --crazyflie-base $(srctree) --print-version
+	@cp $(PROG).elf $(srctree)/$(KBUILD_OUTPUT)/cf2
+	@echo "SITL firmware built: $(KBUILD_OUTPUT)/cf2"
+else
 all: $(PROG).hex $(PROG).bin
 	@echo "Build for the $(PLATFORM) platform!"
 	@$(PYTHON) $(srctree)/tools/make/versionTemplate.py --crazyflie-base $(srctree) --print-version
 	@$(PYTHON) $(srctree)/tools/make/size.py $(SIZE) $(PROG).elf $(MEM_SIZE_FLASH_K) $(MEM_SIZE_RAM_K) $(MEM_SIZE_CCM_K)
+endif
 
-include tools/make/targets.mk
+include $(MAKEFILE_DIR)tools/make/targets.mk
 
 size:
 	@$(PYTHON) $(srctree)/tools/make/size.py $(SIZE) $(PROG).elf $(MEM_SIZE_FLASH_K) $(MEM_SIZE_RAM_K) $(MEM_SIZE_CCM_K)
@@ -206,7 +249,7 @@ check_submodules:
 	@cd $(srctree); $(PYTHON) tools/make/check-for-submodules.py
 
 # Give control over to Kbuild
--include tools/kbuild/Makefile.kbuild
+-include $(MAKEFILE_DIR)tools/kbuild/Makefile.kbuild
 
 
 ifeq ($(KBUILD_SRC),)
@@ -226,4 +269,33 @@ python_wheel: build/cffirmware.py
 	$(PYTHON) bindings/setup.py bdist_wheel
 endif
 
-.PHONY: all clean build compile unit prep erase flash check_submodules trace openocd gdb halt reset flash_dfu flash_dfu_manual flash_verify cload size print_version clean_version bindings_python test_python python_wheel
+# SITL-specific targets
+.PHONY: sitl_plugin crazysim
+
+sitl_plugin:
+	@echo "Building Gazebo plugin..."
+	@mkdir -p $(srctree)/$(KBUILD_OUTPUT)/crazysim_gz
+	@cd $(srctree)/$(KBUILD_OUTPUT)/crazysim_gz && \
+		env -u CFLAGS -u CXXFLAGS -u LDFLAGS -u ARCH_CFLAGS \
+		cmake $(MAKEFILE_DIR)/tools/crazyflie-simulation/simulator_files/gazebo/plugins/CrazySim >/dev/null 2>&1 && \
+		$(MAKE) >/dev/null 2>&1
+	@echo "Gazebo plugin built: $(KBUILD_OUTPUT)/crazysim_gz/libgz_crazysim_plugin.so"
+
+crazysim:
+	@echo "Building SITL firmware..."
+	@$(MAKE) --no-print-directory 2>&1 | grep -v "warning: overriding recipe" | grep -v "warning: ignoring old recipe" | grep -v "silentoldconfig" | grep -v "auto.conf" | grep -v "__sub-make" | grep -v "Error 1" | grep -v "Error 2" | grep -v "fatal: No tags" | grep -v "Try --always"
+	@echo ""
+	@echo "Building Gazebo plugin..."
+	@mkdir -p $(srctree)/$(KBUILD_OUTPUT)/crazysim_gz
+	@cd $(srctree)/$(KBUILD_OUTPUT)/crazysim_gz && \
+		env -u CFLAGS -u CXXFLAGS -u LDFLAGS -u ARCH_CFLAGS \
+		cmake $(MAKEFILE_DIR)/tools/crazyflie-simulation/simulator_files/gazebo/plugins/CrazySim >/dev/null 2>&1 && \
+		$(MAKE) >/dev/null 2>&1
+	@echo "Gazebo plugin built: $(KBUILD_OUTPUT)/crazysim_gz/libgz_crazysim_plugin.so"
+	@echo ""
+	@echo "SITL build complete!"
+	@echo "  Firmware: $(KBUILD_OUTPUT)/cf2"
+	@echo "  Plugin:   $(KBUILD_OUTPUT)/crazysim_gz/"
+	@echo ""
+	@echo "To run simulation:"
+	@echo "  ./tools/crazyflie-simulation/simulator_files/gazebo/launch/sitl_singleagent.sh"

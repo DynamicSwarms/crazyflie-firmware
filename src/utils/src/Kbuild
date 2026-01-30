@@ -1,3 +1,20 @@
+ifeq ($(CONFIG_PLATFORM_SITL),y)
+# SITL utils
+obj-y += cfassert.o
+obj-y += configblocksitl.o
+obj-y += crc32.o
+obj-y += debug.o
+obj-y += eprintf.o
+obj-y += filter.o
+obj-y += num.o
+obj-y += pid.o
+obj-y += rateSupervisor.o
+obj-y += statsCnt.o
+
+### Sub directories for SITL
+obj-y += kve/
+else
+# Hardware utils
 obj-y += cfassert.o
 obj-y += clockCorrectionEngine.o
 obj-y += configblockeeprom.o
@@ -6,10 +23,8 @@ obj-y += crc32.o
 obj-y += debug.o
 obj-y += eprintf.o
 obj-y += buf2buf.o
-
 obj-y += filter.o
 obj-y += FreeRTOS-openocd.o
-
 obj-y += num.o
 obj-y += rateSupervisor.o
 obj-y += sleepus.o
@@ -20,11 +35,11 @@ obj-y += kve/
 obj-y += lighthouse/
 obj-y += tdoa/
 
-
 ### Implementations for abort(), malloc() and free(), needed to interact with apps written in C++
 obj-y += abort.o
 obj-y += malloc.o
 obj-y += pid.o
+endif
 
 ### Rules for handling generated version.c
 obj-y += version.o

@@ -1,3 +1,16 @@
+ifeq ($(CONFIG_PLATFORM_SITL),y)
+# SITL-specific sources
+obj-y += buzzer.o
+obj-y += sensors_sitl.o
+obj-y += sensors.o
+obj-y += storage.o
+obj-y += usec_time_sitl.o
+obj-y += pm_sitl.o
+obj-y += radiolink_sitl.o
+obj-y += socketlink.o
+obj-y += ledseq.o
+else
+# Hardware platform sources
 obj-y += amg8833.o
 obj-y += buzzer.o
 obj-y += freeRTOSdebug.o
@@ -21,3 +34,4 @@ obj-y += usbd_desc.o
 obj-y += usblink.o
 obj-y += usb.o
 obj-y += usec_time.o
+endif

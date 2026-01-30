@@ -39,10 +39,13 @@ We added the following:
 
 #include "param.h"
 #include "log.h"
+#include "debug.h"
 #include "position_controller.h"
 #include "controller_mellinger.h"
 #include "physicalConstants.h"
 #include "platform_defaults.h"
+
+#define DEBUG_MODULE "MELLINGER"
 
 // Global state variable used in the
 // firmware as the only instance and in bindings
@@ -217,33 +220,48 @@ void controllerMellinger(controllerMellinger_t* self, control_t *control, const 
   // [xB_des]
   x_axis_desired = vcross(y_axis_desired, self->z_axis_desired);
 
+  struct mat33 Rdes;
+
+  if (setpoint->mode.roll == modeAbs && 
+    setpoint->mode.pitch == modeAbs && 
+    setpoint->mode.yaw == modeAbs && 
+    setpoint->mode.z == modeDisable) {
+    // Override desired attitude if in attitude mode
+    Rdes = rpy2rotmat(mkvec(radians(setpoint->attitude.roll), -radians(setpoint->attitude.pitch), radians(setpoint->attitude.yaw)));
+    x_axis_desired = mcolumn(Rdes, 0);
+    y_axis_desired = mcolumn(Rdes, 1);
+    self->z_axis_desired = mcolumn(Rdes, 2);
+  } else {
+    Rdes = mcolumns(
+    mkvec(x_axis_desired.x, x_axis_desired.y, x_axis_desired.z),
+    mkvec(y_axis_desired.x, y_axis_desired.y, y_axis_desired.z),
+    mkvec(self->z_axis_desired.x, self->z_axis_desired.y, self->z_axis_desired.z));
+  }
+
   // [eR]
   // Slow version
-  // struct mat33 Rdes = mcolumns(
-  //   mkvec(x_axis_desired.x, x_axis_desired.y, x_axis_desired.z),
-  //   mkvec(y_axis_desired.x, y_axis_desired.y, y_axis_desired.z),
-  //   mkvec(z_axis_desired.x, z_axis_desired.y, z_axis_desired.z));
 
-  // struct mat33 R_transpose = mtranspose(R);
-  // struct mat33 Rdes_transpose = mtranspose(Rdes);
 
-  // struct mat33 eRM = msub(mmult(Rdes_transpose, R), mmult(R_transpose, Rdes));
+  struct mat33 R_transpose = mtranspose(R);
+  struct mat33 Rdes_transpose = mtranspose(Rdes);
 
-  // eR.x = eRM.m[2][1];
-  // eR.y = -eRM.m[0][2];
-  // eR.z = eRM.m[1][0];
+  struct mat33 eRM = msub(mmul(Rdes_transpose, R), mmul(R_transpose, Rdes));
 
-  // Fast version (generated using Mathematica)
-  float x = q.x;
-  float y = q.y;
-  float z = q.z;
-  float w = q.w;
-  eR.x = (-1 + 2*fsqr(x) + 2*fsqr(y))*y_axis_desired.z + self->z_axis_desired.y - 2*(x*y_axis_desired.x*z + y*y_axis_desired.y*z - x*y*self->z_axis_desired.x + fsqr(x)*self->z_axis_desired.y + fsqr(z)*self->z_axis_desired.y - y*z*self->z_axis_desired.z) +    2*w*(-(y*y_axis_desired.x) - z*self->z_axis_desired.x + x*(y_axis_desired.y + self->z_axis_desired.z));
-  eR.y = x_axis_desired.z - self->z_axis_desired.x - 2*(fsqr(x)*x_axis_desired.z + y*(x_axis_desired.z*y - x_axis_desired.y*z) - (fsqr(y) + fsqr(z))*self->z_axis_desired.x + x*(-(x_axis_desired.x*z) + y*self->z_axis_desired.y + z*self->z_axis_desired.z) + w*(x*x_axis_desired.y + z*self->z_axis_desired.y - y*(x_axis_desired.x + self->z_axis_desired.z)));
-  eR.z = y_axis_desired.x - 2*(y*(x*x_axis_desired.x + y*y_axis_desired.x - x*y_axis_desired.y) + w*(x*x_axis_desired.z + y*y_axis_desired.z)) + 2*(-(x_axis_desired.z*y) + w*(x_axis_desired.x + y_axis_desired.y) + x*y_axis_desired.z)*z - 2*y_axis_desired.x*fsqr(z) + x_axis_desired.y*(-1 + 2*fsqr(x) + 2*fsqr(z));
+  eR.x = eRM.m[2][1];
+  eR.y = -eRM.m[0][2];
+  eR.z = eRM.m[1][0];
 
-  // Account for Crazyflie coordinate system
-  eR.y = -eR.y;
+  // // Fast version (generated using Mathematica)
+  // float x = q.x;
+  // float y = q.y;
+  // float z = q.z;
+  // float w = q.w;
+  // eR.x = (-1 + 2*fsqr(x) + 2*fsqr(y))*y_axis_desired.z + self->z_axis_desired.y - 2*(x*y_axis_desired.x*z + y*y_axis_desired.y*z - x*y*self->z_axis_desired.x + fsqr(x)*self->z_axis_desired.y + fsqr(z)*self->z_axis_desired.y - y*z*self->z_axis_desired.z) +    2*w*(-(y*y_axis_desired.x) - z*self->z_axis_desired.x + x*(y_axis_desired.y + self->z_axis_desired.z));
+  // eR.y = x_axis_desired.z - self->z_axis_desired.x - 2*(fsqr(x)*x_axis_desired.z + y*(x_axis_desired.z*y - x_axis_desired.y*z) - (fsqr(y) + fsqr(z))*self->z_axis_desired.x + x*(-(x_axis_desired.x*z) + y*self->z_axis_desired.y + z*self->z_axis_desired.z) + w*(x*x_axis_desired.y + z*self->z_axis_desired.y - y*(x_axis_desired.x + self->z_axis_desired.z)));
+  // eR.z = y_axis_desired.x - 2*(y*(x*x_axis_desired.x + y*y_axis_desired.x - x*y_axis_desired.y) + w*(x*x_axis_desired.z + y*y_axis_desired.z)) + 2*(-(x_axis_desired.z*y) + w*(x_axis_desired.x + y_axis_desired.y) + x*y_axis_desired.z)*z - 2*y_axis_desired.x*fsqr(z) + x_axis_desired.y*(-1 + 2*fsqr(x) + 2*fsqr(z));
+
+  // // Account for Crazyflie coordinate system
+  // eR.y = -eR.y;
 
   // [ew]
   float err_d_roll = 0;
@@ -313,6 +331,9 @@ void controllerMellinger(controllerMellinger_t* self, control_t *control, const 
 
     controllerMellingerReset(self);
   }
+
+  DEBUG_PRINT("thrust=%.0f roll=%.0f pitch=%.0f yaw=%.0f\n",
+              (double)self->cmd_thrust, (double)self->cmd_roll, (double)self->cmd_pitch, (double)self->cmd_yaw);
 }
 
 

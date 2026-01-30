@@ -1,3 +1,8 @@
+ifeq ($(CONFIG_PLATFORM_SITL),y)
+# SITL only needs the deck stub
+obj-y += deck_sitl.o
+else
+# Hardware decks
 obj-y += test/
 obj-$(CONFIG_DECK_ACTIVE_MARKER)        += activeMarkerDeck.o
 obj-$(CONFIG_DECK_AI)                   += aideck.o
@@ -25,3 +30,4 @@ obj-$(CONFIG_DECK_LOADCELL)             += loadcell_nau7802.o
 obj-$(CONFIG_DECK_ACS37800)             += acs37800.o
 obj-$(CONFIG_DECK_DECKCTRL_DEVBOARD)    += deckctrl_devboard.o
 obj-$(CONFIG_DECK_COLORLED)             += color_led_deck.o
+endif

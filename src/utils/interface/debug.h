@@ -28,9 +28,7 @@
 
 #include "config.h"
 #include "console.h"
-#ifndef CONFIG_PLATFORM_SITL
 #include "autoconf.h"
-#endif
 
 #ifdef CONFIG_DEBUG_PRINT_ON_UART1
   #include "uart1.h"

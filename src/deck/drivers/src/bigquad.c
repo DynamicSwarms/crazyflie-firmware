@@ -29,9 +29,7 @@
 #include <string.h>
 
 #include "stm32fxxx.h"
-#ifndef CONFIG_PLATFORM_SITL
 #include "autoconf.h"
-#endif
 #include "config.h"
 #include "motors.h"
 #include "debug.h"

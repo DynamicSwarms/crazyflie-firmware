@@ -3,6 +3,9 @@ obj-$(CONFIG_PLATFORM_CF2) += platform_cf2.o
 obj-$(CONFIG_PLATFORM_CF21BL) += platform_cf21bl.o
 obj-$(CONFIG_PLATFORM_TAG) += platform_tag.o
 obj-$(CONFIG_PLATFORM_FLAPPER) += platform_flapper.o
+obj-$(CONFIG_PLATFORM_SITL) += platform_sitl.o
 obj-y += platform.o
+ifneq ($(CONFIG_PLATFORM_SITL),y)
 obj-y += platform_stm32f4.o
 obj-y += platform_utils.o
+endif

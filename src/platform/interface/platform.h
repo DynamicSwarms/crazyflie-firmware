@@ -28,13 +28,9 @@
 
 #include <stdbool.h>
 
-#ifndef CONFIG_PLATFORM_SITL
 #include "motors.h"
-#endif
 
-#ifndef CONFIG_PLATFORM_SITL
 #include "autoconf.h"
-#endif
 
 #define PLATFORM_DEVICE_TYPE_STRING_MAX_LEN (32 + 1)
 #define PLATFORM_DEVICE_TYPE_MAX_LEN (4 + 1)
@@ -95,8 +91,6 @@ const char* platformConfigGetDeviceType();
 const char* platformConfigGetDeviceTypeName();
 SensorImplementation_t platformConfigGetSensorImplementation();
 bool platformConfigPhysicalLayoutAntennasAreClose();
-#ifndef CONFIG_PLATFORM_SITL
 const MotorPerifDef** platformConfigGetMotorMapping();
-#endif
 
 #endif /* PLATFORM_H_ */

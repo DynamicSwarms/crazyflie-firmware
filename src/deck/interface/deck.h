@@ -6,12 +6,14 @@
 /* Core: handles initialisation, discovery and drivers */
 #include "deck_core.h"
 
-#ifndef CONFIG_PLATFORM_SITL
-/* Deck APIs */
+/* Deck constants (needed even for SITL for type definitions) */
 #include "deck_constants.h"
+
+// #ifndef CONFIG_PLATFORM_SITL
+/* Deck APIs */
 #include "deck_digital.h"
 #include "deck_analog.h"
 #include "deck_spi.h"
-#endif
+// #endif
 
 #endif

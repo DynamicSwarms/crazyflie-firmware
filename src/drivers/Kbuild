@@ -1,3 +1,5 @@
 obj-y += src/
+ifneq ($(CONFIG_PLATFORM_SITL),y)
 obj-y += bosch/src/
 obj-y += esp32/src/
+endif

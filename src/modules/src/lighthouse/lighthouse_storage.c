@@ -38,9 +38,7 @@
 #define DEBUG_MODULE "LH_STORE"
 #include "debug.h"
 
-#ifndef CONFIG_PLATFORM_SITL
 #include "autoconf.h"
-#endif
 
 // Persistent storage
 #define STORAGE_VERSION_KEY "lh/ver"

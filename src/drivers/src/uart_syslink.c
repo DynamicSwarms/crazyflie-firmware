@@ -36,9 +36,7 @@
 #include "queue.h"
 
 #include "config.h"
-#ifndef CONFIG_PLATFORM_SITL
 #include "autoconf.h"
-#endif
 #include "uart_syslink.h"
 #include "crtp.h"
 #include "cfassert.h"

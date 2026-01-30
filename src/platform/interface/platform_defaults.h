@@ -27,9 +27,7 @@
 
 #pragma once
 
-#ifndef CONFIG_PLATFORM_SITL
 #include "autoconf.h"
-#endif
 
 #define __INCLUDED_FROM_PLATFORM_DEFAULTS__
 

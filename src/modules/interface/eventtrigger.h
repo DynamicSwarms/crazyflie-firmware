@@ -42,7 +42,9 @@ enum eventtriggerType_e {
     eventtriggerType_float  = 7,
     eventtrigerType_fp16    = 8,
 };
+#ifndef CONFIG_PLATFORM_SITL
 typedef float float_t;
+#endif
 
 typedef struct eventtriggerPayloadDesc_s
 {

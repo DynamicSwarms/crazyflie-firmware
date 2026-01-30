@@ -36,9 +36,7 @@
 #include "lighthouse_calibration.h"
 #include "lighthouse_geometry.h"
 
-#ifndef CONFIG_PLATFORM_SITL
 #include "autoconf.h"
-#endif
 
 #define PULSE_PROCESSOR_N_SWEEPS 2
 #define PULSE_PROCESSOR_N_SENSORS 4

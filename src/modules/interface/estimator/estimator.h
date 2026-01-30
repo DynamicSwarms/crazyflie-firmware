@@ -25,9 +25,7 @@
  */
 #pragma once
 
-#ifndef CONFIG_PLATFORM_SITL
 #include "autoconf.h"
-#endif
 #include "stabilizer_types.h"
 
 typedef enum {

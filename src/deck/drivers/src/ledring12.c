@@ -30,9 +30,7 @@
 
 #include "stm32fxxx.h"
 
-#ifndef CONFIG_PLATFORM_SITL
 #include "autoconf.h"
-#endif
 #include "deck.h"
 
 #include "FreeRTOS.h"

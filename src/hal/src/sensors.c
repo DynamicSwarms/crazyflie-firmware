@@ -31,9 +31,7 @@
 #include "platform.h"
 #include "debug.h"
 
-#ifndef CONFIG_PLATFORM_SITL
 #include "autoconf.h"
-#endif
 
 // https://gcc.gnu.org/onlinedocs/cpp/Stringizing.html
 #define xstr(s) str(s)

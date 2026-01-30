@@ -36,9 +36,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "config.h"
-#ifndef CONFIG_PLATFORM_SITL
 #include "autoconf.h"
-#endif
 /* ST includes */
 #include "stm32fxxx.h"
 
@@ -361,5 +359,15 @@ const MotorHealthTestDef* motorsGetHealthTestSettings(uint32_t id);
  * @return float The PWM ratio required to get the desired thrust given the battery state.
  */
 float motorsCompensateBatteryVoltage(uint32_t id, float iThrust, float supplyVoltage);
+
+#ifdef CONFIG_PLATFORM_SITL
+/**
+ * @brief Send motor PWM values to SITL simulator via CRTP
+ *
+ * Should be called after all motor ratios are set. Sends the current motor
+ * PWM values to the Gazebo simulator via CRTP at approximately 1kHz rate.
+ */
+void sendMotorPacketsSITL(void);
+#endif
 
 #endif /* __MOTORS_H__ */

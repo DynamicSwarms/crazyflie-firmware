@@ -1,3 +1,8 @@
+ifeq ($(CONFIG_PLATFORM_SITL),y)
+# SITL only needs minimal deck support
+obj-y += deck_info.o
+else
+# Hardware needs full deck core
 obj-y += deck_drivers.o
 obj-y += deck_discovery.o
 obj-y += deck_info.o
@@ -5,3 +10,4 @@ obj-y += deck_memory.o
 obj-y += deck.o
 obj-y += deck_test.o
 obj-y += deckctrl_dfu_memory.o
+endif

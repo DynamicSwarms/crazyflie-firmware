@@ -1,3 +1,8 @@
+ifeq ($(CONFIG_PLATFORM_SITL),y)
+# SITL drivers (minimal set)
+obj-y += motors_sitl.o
+else
+# Hardware platform drivers only
 obj-y += ak8963.o
 obj-y += cppm.o
 obj-y += eeprom.o
@@ -25,3 +30,4 @@ obj-y += vl53l0x.o
 obj-y += vl53l1x.o
 obj-y += watchdog.o
 obj-y += ws2812_cf2.o
+endif

@@ -203,7 +203,10 @@ uint16_t getMotorRatio(int id)
     case 2: return motorPower.m3;
     case 3: return motorPower.m4;
   }
+
+  return -1;
 }
+
 void motorsSetRatio(const motors_thrust_pwm_t* motorPwm)
 {
   motorPower.m1 = motorPwm->motors.m1;

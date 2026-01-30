@@ -34,18 +34,16 @@
 
 #include "log.h"
 #include "param.h"
-#ifndef CONFIG_PLATFORM_SITL
+// #ifndef CONFIG_PLATFORM_SITL
 #include "motors.h"
-#endif
+// #endif
 #include "power_distribution.h"
 #include "supervisor.h"
 #include "supervisor_state_machine.h"
 #include "platform_defaults.h"
 #include "crtp_localization_service.h"
 #include "system.h"
-#ifndef CONFIG_PLATFORM_SITL
 #include "autoconf.h"
-#endif
 
 #define DEBUG_MODULE "SUP"
 #include "debug.h"
@@ -192,23 +190,38 @@ bool supervisorRequestArming(const bool doArm) {
 static bool isFlyingCheck(SupervisorMem_t* this, const uint32_t tick) {
   bool isThrustOverIdle = false;
   const uint32_t idleThrust = powerDistributionGetIdleThrust();
-  #ifndef CONFIG_PLATFORM_SITL
+
+#ifdef CONFIG_PLATFORM_SITL
+  uint32_t motorRatios[NBR_OF_MOTORS];
+  uint32_t motorScaledThrust[NBR_OF_MOTORS];
+#endif
+
   for (int i = 0; i < NBR_OF_MOTORS; ++i) {
     const uint32_t ratio = powerDistributionMotorType(i) * motorsGetRatio(i);
+#ifdef CONFIG_PLATFORM_SITL
+    motorRatios[i] = motorsGetRatio(i);
+    motorScaledThrust[i] = ratio;
+#endif
     if (ratio > idleThrust) {
       isThrustOverIdle = true;
       break;
     }
   }
-  #else
-  for (int i = 0; i < NBR_OF_MOTORS; ++i) {
-    uint16_t ratio = getMotorRatio(i);
-    if (ratio > idleThrust) {
-      isThrustOverIdle = true;
-      break;
-    }
+
+#ifdef CONFIG_PLATFORM_SITL
+  // Periodically log motor thrust vs idle when armed but not flying
+  static uint32_t lastMotorDebugTime = 0;
+  if (supervisorIsArmed() && !isThrustOverIdle && (tick - lastMotorDebugTime) > M2T(5000)) {
+    DEBUG_PRINT("NOT FLYING: Motors[%u %u %u %u] Scaled[%u %u %u %u] Idle=%u Type=%d\n",
+                (unsigned int)motorRatios[0], (unsigned int)motorRatios[1],
+                (unsigned int)motorRatios[2], (unsigned int)motorRatios[3],
+                (unsigned int)motorScaledThrust[0], (unsigned int)motorScaledThrust[1],
+                (unsigned int)motorScaledThrust[2], (unsigned int)motorScaledThrust[3],
+                (unsigned int)idleThrust, powerDistributionMotorType(0));
+    lastMotorDebugTime = tick;
   }
-  #endif
+#endif
+
   if (isThrustOverIdle) {
     this->latestThrustTick = tick;
   }

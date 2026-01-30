@@ -1,4 +1,11 @@
+ifeq ($(CONFIG_PLATFORM_SITL),y)
+# SITL only needs the deck stub driver
+obj-y += core/
+obj-y += drivers/src/
+else
+# Hardware platforms need full deck support
 obj-y += api/
 obj-y += backends/
 obj-y += core/
 obj-y += drivers/src/
+endif
