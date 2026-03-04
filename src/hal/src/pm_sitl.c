@@ -7,6 +7,7 @@
 static bool isInit = false;
 static float batteryVoltage = 4.2f;
 static uint16_t batteryVoltageMV = 4200;
+static float chargeCurrent = 0.0f;
 static float batteryVoltageMin = 4.2f;
 static float batteryVoltageMax = 4.2f;
 static int8_t pmState = 0;
@@ -109,6 +110,7 @@ void pmTask(void *param)
 LOG_GROUP_START(pm)
 LOG_ADD_CORE(LOG_FLOAT, vbat, &batteryVoltage)
 LOG_ADD(LOG_UINT16, vbatMV, &batteryVoltageMV)
+LOG_ADD(LOG_FLOAT, chargeCurrent, &chargeCurrent)
 LOG_ADD_CORE(LOG_INT8, state, &pmState)
 LOG_ADD_CORE(LOG_UINT8, batteryLevel, &batteryLevel)
 LOG_GROUP_STOP(pm)

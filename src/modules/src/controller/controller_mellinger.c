@@ -332,8 +332,8 @@ void controllerMellinger(controllerMellinger_t* self, control_t *control, const 
     controllerMellingerReset(self);
   }
 
-  DEBUG_PRINT("thrust=%.0f roll=%.0f pitch=%.0f yaw=%.0f\n",
-              (double)self->cmd_thrust, (double)self->cmd_roll, (double)self->cmd_pitch, (double)self->cmd_yaw);
+  //DEBUG_PRINT("thrust=%.0f roll=%.0f pitch=%.0f yaw=%.0f\n",
+  //            (double)self->cmd_thrust, (double)self->cmd_roll, (double)self->cmd_pitch, (double)self->cmd_yaw);
 }
 
 
