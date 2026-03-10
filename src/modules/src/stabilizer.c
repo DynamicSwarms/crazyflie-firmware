@@ -272,8 +272,8 @@ static void controlMotors(const control_t* control) {
   static uint32_t lastPrintTime = 0;
   uint32_t now = xTaskGetTickCount();
   if (now - lastPrintTime > M2T(500)) {
-    DEBUG_PRINT("PWM m1:%u m2:%u m3:%u m4:%u\n",
-      motorPwm.motors.m1, motorPwm.motors.m2, motorPwm.motors.m3, motorPwm.motors.m4);
+    // DEBUG_PRINT("PWM m1:%u m2:%u m3:%u m4:%u\n",
+    //   motorPwm.motors.m1, motorPwm.motors.m2, motorPwm.motors.m3, motorPwm.motors.m4);
     lastPrintTime = now;
   }
 

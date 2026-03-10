@@ -212,12 +212,12 @@ static bool isFlyingCheck(SupervisorMem_t* this, const uint32_t tick) {
   // Periodically log motor thrust vs idle when armed but not flying
   static uint32_t lastMotorDebugTime = 0;
   if (supervisorIsArmed() && !isThrustOverIdle && (tick - lastMotorDebugTime) > M2T(5000)) {
-    DEBUG_PRINT("NOT FLYING: Motors[%u %u %u %u] Scaled[%u %u %u %u] Idle=%u Type=%d\n",
-                (unsigned int)motorRatios[0], (unsigned int)motorRatios[1],
-                (unsigned int)motorRatios[2], (unsigned int)motorRatios[3],
-                (unsigned int)motorScaledThrust[0], (unsigned int)motorScaledThrust[1],
-                (unsigned int)motorScaledThrust[2], (unsigned int)motorScaledThrust[3],
-                (unsigned int)idleThrust, powerDistributionMotorType(0));
+    // DEBUG_PRINT("NOT FLYING: Motors[%u %u %u %u] Scaled[%u %u %u %u] Idle=%u Type=%d\n",
+    //             (unsigned int)motorRatios[0], (unsigned int)motorRatios[1],
+    //             (unsigned int)motorRatios[2], (unsigned int)motorRatios[3],
+    //             (unsigned int)motorScaledThrust[0], (unsigned int)motorScaledThrust[1],
+    //             (unsigned int)motorScaledThrust[2], (unsigned int)motorScaledThrust[3],
+    //             (unsigned int)idleThrust, powerDistributionMotorType(0));
     lastMotorDebugTime = tick;
   }
 #endif
