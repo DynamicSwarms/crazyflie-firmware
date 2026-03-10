@@ -28,6 +28,7 @@
 #include "task.h"
 
 #include "power_distribution.h"
+#include "platform_defaults.h"
 
 #include <string.h>
 #include "log.h"
@@ -207,20 +208,24 @@ uint16_t getMotorRatio(int id)
   return -1;
 }
 
-void motorsSetRatio(const motors_thrust_pwm_t* motorPwm)
-{
-  motorPower.m1 = motorPwm->motors.m1;
-  motorPower.m2 = motorPwm->motors.m2;
-  motorPower.m3 = motorPwm->motors.m3;
-  motorPower.m4 = motorPwm->motors.m4;
-
-  if (xTaskGetTickCount() - lastSentTime >= M2T(1)){
-    memcpy(p.data , (uint8_t *) &motorPower , p.size);
-    crtpSendPacket(&p);
-    lastSentTime = xTaskGetTickCount();
-  }
-  // DEBUG_PRINT("%d , %d , %d , %d  \n", (int) motorPower.m1 , (int) motorPower.m2 , (int) motorPower.m3 , (int) motorPower.m4 );
+float powerDistributionGetMaxThrust() {
+  return STABILIZER_NR_OF_MOTORS * THRUST_MAX;
 }
+
+//void motorsSetRatio(const motors_thrust_pwm_t* motorPwm)
+//{
+//  motorPower.m1 = motorPwm->motors.m1;
+//  motorPower.m2 = motorPwm->motors.m2;
+//  motorPower.m3 = motorPwm->motors.m3;
+//  motorPower.m4 = motorPwm->motors.m4;
+//
+//  if (xTaskGetTickCount() - lastSentTime >= M2T(1)){
+//    memcpy(p.data , (uint8_t *) &motorPower , p.size);
+//    crtpSendPacket(&p);
+//    lastSentTime = xTaskGetTickCount();
+//  }
+//  // DEBUG_PRINT("%d , %d , %d , %d  \n", (int) motorPower.m1 , (int) motorPower.m2 , (int) motorPower.m3 , (int) motorPower.m4 );
+//}
 /**
  * Power distribution parameters
  */
