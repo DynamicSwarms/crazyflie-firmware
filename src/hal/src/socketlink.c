@@ -47,11 +47,19 @@
 #include <sys/socket.h>
 #include <poll.h>
 
+#include <sys/un.h>
+
 #include <errno.h>
 
 // Global variables for socket management
-static struct sockaddr_in myaddr;
-static struct sockaddr_in remaddr;
+static struct sockaddr_in myaddr_udp;
+static struct sockaddr_in remaddr_udp;
+static struct sockaddr_un myaddr_unix;
+static struct sockaddr_un remaddr_unix;
+
+struct sockaddr* remote_addr_ptr = NULL; // pointer used in send/recv
+socklen_t remote_addr_len = 0;
+
 static socklen_t addrlen;
 static int fd;
 static struct pollfd fds[1];
@@ -89,7 +97,7 @@ static void socketlinkTask(void *param)
     // Check if any data was received
     if (fds[0].revents & POLLIN){
       // Fetch a socket data
-      recvlen = recvfrom(fd, p.raw, sizeof(p.raw), 0, (struct sockaddr *)&remaddr, &addrlen);
+      recvlen = recvfrom(fd, p.raw, sizeof(p.raw), 0, remote_addr_ptr, &addrlen);
       if (recvlen > 0){
         p.size = recvlen - 1; // We remove the header size
         ASSERT(xQueueSend(crtpPacketDelivery, &p, 0) == pdPASS);
@@ -123,7 +131,7 @@ static int socketlinkSendPacket(CRTPPacket *p)
 
   dataSize = p->size + 1;
   memcpy(&(socket_buff[0]) , p->raw , dataSize);
-  dataSize = sendto(fd, socket_buff, dataSize, 0, (struct sockaddr *)&remaddr, addrlen);
+  dataSize = sendto(fd, socket_buff, dataSize, 0, remote_addr_ptr, addrlen);
   // DEBUG_PRINT("sending : port: %d channel: %d data:%d %d %d size: %d\n" , p->port , p->channel, p->data[0], p->data[1], p->data[2], p->size);
   // Shutdown if not able to send ???
   if (dataSize < 0){
@@ -147,8 +155,10 @@ void socketlinkInit()
   if(isInit)
     return;
 
-  // Create UDP socket
-  if ((fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0){
+  // --- Create socket ---
+  if (use_unix_socket) fd = socket(AF_UNIX, SOCK_DGRAM, 0);
+  else fd = socket(AF_INET, SOCK_DGRAM, 0);
+  if (fd < 0){
     isInit = false;
     DEBUG_PRINT("cannot create socket\n");
     ASSERT_FAILED();
@@ -156,13 +166,25 @@ void socketlinkInit()
   }
   DEBUG_PRINT("Create socket succeed \n");
 
-  // Let the OS pick this instance port and address
-  memset((char *)&myaddr, 0, sizeof(myaddr));
-  myaddr.sin_family = AF_INET;
-  myaddr.sin_addr.s_addr = htonl(INADDR_ANY);
-  myaddr.sin_port = htons(0);
+  if (use_unix_socket)
+  {
+    memset(&myaddr_unix, 0, sizeof(myaddr_unix));
+    myaddr_unix.sun_family = AF_UNIX;
+    myaddr_unix.sun_path[0] = '\0'; // Abstract socket, so no file is beeing created
+    strncpy(myaddr_unix.sun_path + 1, unix_local_path, sizeof(myaddr_unix.sun_path) - 2);
+  } else {
+    // Let the OS pick this instance port and address
+    memset((char *)&myaddr_udp, 0, sizeof(myaddr_udp));
+    myaddr_udp.sin_family = AF_INET;
+    myaddr_udp.sin_addr.s_addr = htonl(INADDR_ANY);
+    myaddr_udp.sin_port = htons(0);
+  }
 
-  if (bind(fd, (struct sockaddr *)&myaddr, sizeof(myaddr)) < 0){
+  // --- Bind the socket ---
+  int bind_result;
+  if (use_unix_socket) bind_result = bind(fd, (struct sockaddr *)&myaddr_unix, sizeof(myaddr_unix));
+  else bind_result = bind(fd, (struct sockaddr *)&myaddr_udp, sizeof(myaddr_udp));  
+  if (bind_result < 0){
     isInit =false;
     DEBUG_PRINT("Binding failed \n");
     ASSERT_FAILED();
@@ -170,20 +192,35 @@ void socketlinkInit()
   }
   DEBUG_PRINT("Binding succeed \n");
 
-  // Initialize destination address (gazebo handler server)
-  memset((char *)&remaddr, 0, sizeof(remaddr));\
-  remaddr.sin_family = AF_INET;
-  if (strcmp(address_host, "INADDR_ANY") == 0){
-    remaddr.sin_addr.s_addr =  htonl(INADDR_ANY);
-  } else if (inet_addr(address_host) == INADDR_NONE){
-    isInit = false;
-    return;
-  } else{
-    remaddr.sin_addr.s_addr = inet_addr(address_host); // Set the address if valid
+  // --- Setup remote address ---
+  if (use_unix_socket)
+  {
+    memset(&remaddr_unix, 0, sizeof(remaddr_unix));
+    remaddr_unix.sun_family = AF_UNIX;
+    remaddr_unix.sun_path[0] = '\0'; // Abstract socket, so no file is beeing created
+    strncpy(remaddr_unix.sun_path + 1, unix_remote_path, sizeof(remaddr_unix.sun_path) - 2);
+
+    remote_addr_ptr = (struct sockaddr *)&remaddr_unix;
+    addrlen = sizeof(remaddr_unix);
+  } else 
+  {
+    // Initialize destination address (gazebo handler server)
+    memset((char *)&remaddr_udp, 0, sizeof(remaddr_udp));\
+    remaddr_udp.sin_family = AF_INET;
+    if (strcmp(address_host, "INADDR_ANY") == 0){
+      remaddr_udp.sin_addr.s_addr =  htonl(INADDR_ANY);
+    } else if (inet_addr(address_host) == INADDR_NONE){
+      isInit = false;
+      return;
+    } else{
+      remaddr_udp.sin_addr.s_addr = inet_addr(address_host); // Set the address if valid
+    }
+    remaddr_udp.sin_port = htons(crtp_port); // Set the port
+    //Initialize addrlen
+
+    remote_addr_ptr = (struct sockaddr *)&remaddr_udp;
+    addrlen =  sizeof(remaddr_udp);
   }
-  remaddr.sin_port = htons(crtp_port); // Set the port
-  //Initialize addrlen
-  addrlen =  sizeof(remaddr);
 
   // initialize the poll structure
   fds[0].fd = fd;
@@ -203,7 +240,7 @@ void socketlinkInit()
     count = 0;
     socketlinkSendPacket(&p);
     while(count < max_count){
-      recvlen = recvfrom(fd, socket_buff, sizeof(socket_buff), 0, (struct sockaddr *)&remaddr, &addrlen);
+      recvlen = recvfrom(fd, socket_buff, sizeof(socket_buff), 0, remote_addr_ptr, &addrlen);
       if (recvlen == 1 && socket_buff[0] == 0xF3){
           commInitialized = true;
           break;

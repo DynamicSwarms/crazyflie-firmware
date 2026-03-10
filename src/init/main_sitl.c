@@ -44,7 +44,7 @@
 #include "platform.h"
 #include "system.h"
 #include "usec_time.h"
-
+#include "string.h"
 
 #define CRTP_PORT 19950
 char CRTP_SERVER_ADDRESS[] = "INADDR_ANY";
@@ -55,11 +55,28 @@ uint16_t crtp_port;
 char* address_host;
 // /* Store the cf instance unique Identifiant */
 // uint8_t cf_id;
+bool use_unix_socket = false;
+char unix_local_path[108];
+char unix_remote_path[108];
 
 int main(int argc, char **argv) 
 {
+  if (argc >= 2 && strcmp(argv[1], "unix") == 0) {
+    use_unix_socket = true;
+    if (argc >= 3)
+      strcpy(unix_local_path, argv[2]);
+    else
+      strcpy(unix_local_path, "/tmp/crazyflie_sitl.sock");
 
-  if (argc == 3){
+    if (argc >= 4)
+      strcpy(unix_remote_path, argv[3]);
+    else
+      strcpy(unix_remote_path, "/tmp/crazyflie_client.sock");
+
+    printf("Using UNIX socket\n");
+    printf("local  : %s\n", unix_local_path);
+    printf("remote : %s\n", unix_remote_path);
+  } else  if (argc == 3){
     crtp_port = atoi(argv[1]);
     address_host = argv[2];
     printf("address : %s , port : %d \n" , address_host , crtp_port );

@@ -38,6 +38,10 @@ extern uint16_t crtp_port;
 extern char* address_host;
 // /* Store the cf instance unique Identifiant */
 // extern uint8_t cf_id;
+/*unix configuration*/
+extern bool use_unix_socket;
+extern char unix_local_path[108];
+extern char unix_remote_path[108];
 
 /* Initialize the socket link */
 void socketlinkInit();
