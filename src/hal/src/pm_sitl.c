@@ -32,6 +32,20 @@ float pmGetBatteryVoltage(void)
   return batteryVoltage;
 }
 
+void pmSetBatteryVoltage(float voltage)
+{
+  batteryVoltage = voltage;
+  batteryVoltageMV = (uint16_t)(voltage * 1000.0f);
+  if (voltage < batteryVoltageMin) {
+    batteryVoltageMin = voltage;
+  }
+  if (voltage > batteryVoltageMax) {
+    batteryVoltageMax = voltage;
+  }
+  batteryLevel = voltage <= 3.0f ? 0 :
+    (voltage >= 4.2f ? 100 : (uint8_t)(((voltage - 3.0f) / 1.2f) * 100.0f));
+}
+
 float pmGetBatteryVoltageMin(void)
 {
   return batteryVoltageMin;
@@ -44,7 +58,7 @@ float pmGetBatteryVoltageMax(void)
 
 bool pmIsBatteryLow(void)
 {
-  return false;
+  return batteryVoltage <= batteryLowVoltage;
 }
 
 bool pmIsChargerConnected(void)

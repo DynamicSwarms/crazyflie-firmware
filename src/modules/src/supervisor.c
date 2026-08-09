@@ -98,6 +98,10 @@ typedef struct {
 
 static SupervisorMem_t supervisorMem;
 
+#ifdef CONFIG_PLATFORM_SITL
+static bool simulatedTumble = false;
+#endif
+
 const static setpoint_t nullSetpoint;
 
 void infoDump(const SupervisorMem_t* this);
@@ -170,6 +174,13 @@ bool supervisorRequestCrashRecovery(const bool doRecovery) {
 
   return false;
 }
+
+#ifdef CONFIG_PLATFORM_SITL
+void supervisorSimulateCrash(void) {
+  simulatedTumble = true;
+  supervisorRequestCrashRecovery(false);
+}
+#endif
 
 bool supervisorRequestArming(const bool doArm) {
   if (doArm == supervisorMem.isArmingActivated) {
@@ -355,7 +366,11 @@ static supervisorConditionBits_t updateAndPopulateConditions(SupervisorMem_t* th
   }
 
   const bool isTumbled = isTumbledCheck(this, sensors, currentTick);
-  if (isTumbled) {
+  if (isTumbled
+#ifdef CONFIG_PLATFORM_SITL
+      || simulatedTumble
+#endif
+  ) {
     if (tumbleCheckEnabled)
     {
       conditions |= SUPERVISOR_CB_IS_TUMBLED;

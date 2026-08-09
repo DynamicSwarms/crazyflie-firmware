@@ -77,6 +77,11 @@ void pmSyslinkUpdate(SyslinkPacket *slp);
  */
 float pmGetBatteryVoltage(void);
 
+#ifdef CONFIG_PLATFORM_SITL
+/** Set the virtual battery voltage. Implemented by the SITL power backend. */
+void pmSetBatteryVoltage(float voltage);
+#endif
+
 /**
  * Returns the min battery voltage i volts as a float
  */

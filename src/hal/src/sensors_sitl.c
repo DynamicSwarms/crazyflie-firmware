@@ -37,10 +37,13 @@
 #include "filter.h"
 #include "param.h"
 #include "log.h"
+#include "pm.h"
+#include "supervisor.h"
 
 #include "crtp.h"
 
 #include <math.h>
+#include <string.h>
 
 // We try to be as close as possible from the real sensor implementation
 #define MAG_GAUSS_PER_LSB                                 666.7f
@@ -69,6 +72,8 @@ enum SensorTypeSim_e {
   SENSOR_GYRO_ACC_SIM           = 0,
   SENSOR_MAG_SIM                = 1,
   SENSOR_BARO_SIM               = 2,
+  SENSOR_BATTERY_SIM            = 3,
+  SENSOR_CRASH_SIM              = 4,
 };
 
 typedef struct
@@ -209,6 +214,16 @@ static void sensorsTask(void *param)
         // measurement.data.barometer.baro = sensors.baro;
         // estimatorEnqueue(&measurement);
         xQueueOverwrite(barometerDataQueue, &sensors.baro);
+        break;
+      case SENSOR_BATTERY_SIM:
+        if (p.size >= 1 + sizeof(float)) {
+          float voltage;
+          memcpy(&voltage, &(p.data[1]), sizeof(voltage));
+          pmSetBatteryVoltage(voltage);
+        }
+        break;
+      case SENSOR_CRASH_SIM:
+        supervisorSimulateCrash();
         break;
       default :
         break;

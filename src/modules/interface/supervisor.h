@@ -133,3 +133,8 @@ bool supervisorIsCrashed();
  * @return false  The request could not be granted
  */
 bool supervisorRequestCrashRecovery(const bool doRecover);
+
+#ifdef CONFIG_PLATFORM_SITL
+/** Force the SITL supervisor into a crashed and tumbled state. */
+void supervisorSimulateCrash(void);
+#endif
