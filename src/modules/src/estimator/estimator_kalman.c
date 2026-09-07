@@ -219,7 +219,11 @@ static void kalmanTask(void* parameters) {
   uint32_t nowMs = T2M(xTaskGetTickCount());
   uint32_t nextPredictionMs = nowMs;
 
+#ifdef CONFIG_PLATFORM_SITL
+  rateSupervisorInit(&rateSupervisorContext, nowMs, ONE_SECOND, PREDICT_RATE - 10, PREDICT_RATE + 10, 1);
+#else
   rateSupervisorInit(&rateSupervisorContext, nowMs, ONE_SECOND, PREDICT_RATE - 1, PREDICT_RATE + 1, 1);
+#endif
 
   while (true) {
     xSemaphoreTake(runTaskSemaphore, portMAX_DELAY);

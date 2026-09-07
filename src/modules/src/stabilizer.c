@@ -329,7 +329,11 @@ static void stabilizerTask(void* param)
 
   systemWaitStart();
   DEBUG_PRINT("Starting stabilizer loop\n");
+#ifdef CONFIG_PLATFORM_SITL
+  rateSupervisorInit(&rateSupervisorContext, xTaskGetTickCount(), M2T(1000), 950, 1050, 1);
+#else
   rateSupervisorInit(&rateSupervisorContext, xTaskGetTickCount(), M2T(1000), 997, 1003, 1);
+#endif
   xRateSupervisorSemaphore = xSemaphoreCreateBinary();
   STATIC_MEM_TASK_CREATE(rateSupervisorTask, rateSupervisorTask, RATE_SUPERVISOR_TASK_NAME, NULL, RATE_SUPERVISOR_TASK_PRI);
 
